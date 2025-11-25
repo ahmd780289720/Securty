@@ -135,3 +135,4 @@ const result = await modelRef.generateContent(parts);
 
   return `DEBUG من Google: ${msg}`;
 }
+};
