@@ -1,5 +1,5 @@
-
-import { GoogleGenAI } from "@google/genai";
+ 
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Helper to safely check connection
 const isOffline = () => !navigator.onLine;
@@ -9,7 +9,7 @@ const getAIClient = () => {
   try {
     // Strict check for API Key availability
     if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
-      return new GoogleGenAI({ apiKey: process.env.API_KEY });
+      return new GoogleGenerativeAI({ apiKey: process.env.API_KEY });
     }
     return null;
   } catch (e) {
