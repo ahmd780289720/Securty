@@ -121,7 +121,7 @@ export const askTutor = async (query: string, history: string[], imageBase64?: s
     parts.push({ text: fullPrompt });
 
     const modelRef = ai.getGenerativeModel({ model });
-const result = await modelRef.generateContent({ contents: parts });
+const result = await modelRef.generateContent({ parts });
 
 return result.response.text() || "خطأ في معالجة البيانات.";
   } catch (error) {
