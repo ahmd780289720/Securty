@@ -121,36 +121,40 @@ export const askTutor = async (query: string, history: string[], imageBase64?: s
 
     const modelRef = ai.getGenerativeModel({ model });
 const result = await modelRef.generateContent(parts);
+    const response = await result.response;
+    const text = await response.text();
 
-return result.response.text() || "خطأ في معالجة البيانات.";
-  } } catch (error: any) {
+    return text || "لا يوجد رد متاح حالياً.";
+  } catch (error: any) {
     console.error("AI Error:", error);
 
-    // 1) حالة عدم وجود مفتاح أصلاً
+    // (1) حالة عدم وجود مفتاح
     if (!GOOGLE_API_KEY) {
       return "مفتاح API غير مضبوط داخل التطبيق. افتح ملف env.local وتأكد من وجود GOOGLE_API_KEY بالقيمة الصحيحة.";
     }
 
-    // 2) نستخرج الرسالة الحقيقيّة من الخطأ
+    // (2) استخراج الرسالة الحقيقيّة
     const msg =
       error && typeof error === "object" && "message" in error
-        ? String(error.message)
+        ? String((error as any).message)
         : String(error);
 
-    // 3) أخطاء شائعة مرتبطة بالمفتاح
-    if (msg.toLowerCase().includes("api key") || msg.toLowerCase().includes("apikey")) {
-      return "مفتاح Google AI غير صالح أو تم حذفه أو تقييده. أنشئ مفتاحًا جديدًا من Google AI Studio وانسخه إلى ملف env.local.";
+    // (3) أخطاء مرتبطة بالمفتاح
+    const lower = msg.toLowerCase();
+
+    if (lower.includes("api key") || lower.includes("apikey")) {
+      return "مفتاح Google AI غير صالح أو تم حذفه أو تقييده. أنشئ مفتاحًا جديدًا وانسخه إلى env.local.";
     }
 
-    if (msg.toLowerCase().includes("permission") || msg.toLowerCase().includes("403")) {
-      return "لا توجد صلاحيات كافية لاستخدام واجهة Google AI بهذا المفتاح. تأكد أن المشروع مفعل وأن المفتاح مسموح له باستخدام النماذج.";
+    if (lower.includes("permission") || lower.includes("403")) {
+      return "لا توجد صلاحيات كافية لاستخدام نماذج Google AI بهذا المفتاح.";
     }
 
-    if (msg.toLowerCase().includes("quota")) {
-      return "تم استهلاك الحصة المجانية لمفتاح Google AI. جرّب مفتاحًا جديدًا أو انتظر إعادة التعيين.";
+    if (lower.includes("quota")) {
+      return "تم استهلاك الحصة المجانية لمفتاح Google AI. استخدم مفتاحًا جديدًا.";
     }
 
-    // 4) رسالة افتراضية مع نص الخطأ للمساعدة في التشخيص
-    return `فشل الاتصال بوحدة المعالجة المركزية (Error processing request): ${msg}`;
+    // (4) رسالة افتراضية مع الخطأ الخام
+    return `فشل الاتصال بوحدة المعالجة المركزية: ${msg}`;
   }
 };
