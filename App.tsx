@@ -133,35 +133,35 @@ const App: React.FC = () => {
   }, []);
 
   // 4. Capacitor Hardware Back Button Handler
+  // 4. Capacitor Hardware Back Button Handler
   useEffect(() => {
-    const onBack = (ev: any) => {
-      // This is the critical part for Android APK
-      ev.detail.register(); 
-      
+    // مستمع لزر الرجوع في أندرويد
+    const backListener = CapacitorApp.addListener('backButton', ({ canGoBack }: any) => {
       const { view, mode } = stateRef.current;
-      
-      // If we are at the root (Dashboard), confirm exit
-      if (view === 'dashboard' && mode === 'none') {
-         const confirm = window.confirm("هل تريد الخروج من التطبيق؟");
-         if (confirm) {
-           CapacitorApp.exitApp();
-         }
-      } else {
-         // Otherwise, always go back in history
-         // This triggers 'popstate', which updates the UI
-         window.history.back();
-      }
-    };
 
-    // Register listener only once
-    CapacitorApp.removeAllListeners().then(() => {
-        CapacitorApp.addListener('backButton', onBack);
+      // لو فيه تاريخ رجوع داخل التطبيق نمشي خطوة للخلف
+      if (canGoBack) {
+        window.history.back();
+        return;
+      }
+
+      // لو في الشاشة الرئيسية بدون أي وضع لعب → خروج من التطبيق
+      if (view === 'dashboard' && mode === 'none') {
+        const confirmExit = window.confirm("هل تريد الخروج من التطبيق؟");
+        if (confirmExit) {
+          CapacitorApp.exitApp();
+        }
+      } else {
+        // في أي شاشة ثانية → رجوع خطوة للخلف
+        window.history.back();
+      }
     });
 
+    // تنظيف المستمع عند إغلاق الكومبوننت
     return () => {
-      CapacitorApp.removeAllListeners();
+      backListener.remove();
     };
-  }, []); // Empty dependency array = stable listener
+  }, []); //Empty dependency array = stable listener
 
   // --- NAVIGATION SYSTEM END ---
 
