@@ -9,7 +9,7 @@ const getAIClient = () => {
   try {
     // Strict check for API Key availability
     if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
-      return new GoogleGenerativeAI({ apiKey: process.env.API_KEY });
+      return new GoogleGenerativeAI(process.env.API_KEY);
     }
     return null;
   } catch (e) {
@@ -38,12 +38,9 @@ export const explainWrongAnswer = async (question: string, userAnswer: string, c
       المهمة: اشرح تقنياً وبشكل مباشر سبب الخطأ.
     `;
 
-    const response = await ai.models.generateContent({
-      model: model,
-      contents: prompt,
-    });
-
-    return response.text;
+    const modelRef = ai.getGenerativeModel({ model });
+const result = await modelRef.generateContent(prompt);
+return result.response.text();
   } catch (error) {
     return null;
   }
@@ -67,12 +64,9 @@ export const simplifyLesson = async (lessonContent: string): Promise<string | nu
       """
     `;
 
-    const response = await ai.models.generateContent({
-      model: model,
-      contents: prompt,
-    });
-
-    return response.text;
+    const modelRef = ai.getGenerativeModel({ model });
+const result = await modelRef.generateContent(prompt);
+return result.response.text();
   } catch (error) {
     return null;
   }
@@ -126,12 +120,10 @@ export const askTutor = async (query: string, history: string[], imageBase64?: s
 
     parts.push({ text: fullPrompt });
 
-    const response = await ai.models.generateContent({
-      model: model,
-      contents: { parts: parts },
-    });
+    const modelRef = ai.getGenerativeModel({ model });
+const result = await modelRef.generateContent({ contents: { parts } });
 
-    return response.text || "خطأ في معالجة البيانات.";
+return result.response.text() || "خطأ في معالجة البيانات.";
   } catch (error) {
     console.error("AI Error:", error);
     return "فشل الاتصال بوحدة المعالجة المركزية (Error processing request).";
