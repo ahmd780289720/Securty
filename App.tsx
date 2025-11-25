@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
+import type { PluginListenerHandle } from '@capacitor/core';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import CurriculumView from './components/CurriculumView';
@@ -133,35 +134,40 @@ const App: React.FC = () => {
   }, []);
 
   // 4. Capacitor Hardware Back Button Handler
-  // 4. Capacitor Hardware Back Button Handler
-  useEffect(() => {
-    // مستمع لزر الرجوع في أندرويد
-    const backListener = CapacitorApp.addListener('backButton', ({ canGoBack }: any) => {
-      const { view, mode } = stateRef.current;
+// 4. Capacitor Hardware Back Button Handler
+useEffect(() => {
+  let backHandler: PluginListenerHandle | null = null;
 
-      // لو فيه تاريخ رجوع داخل التطبيق نمشي خطوة للخلف
-      if (canGoBack) {
-        window.history.back();
-        return;
+  const onBack = (ev: any) => {
+    if (ev && ev.detail && typeof ev.detail.register === 'function') {
+      ev.detail.register();
+    }
+
+    const { view, mode } = stateRef.current;
+
+    if (view === 'dashboard' && mode === 'none') {
+      const confirmExit = window.confirm('هل تريد الخروج من التطبيق؟');
+      if (confirmExit) {
+        CapacitorApp.exitApp();
       }
+    } else {
+      window.history.back();
+    }
+  };
 
-      // لو في الشاشة الرئيسية بدون أي وضع لعب → خروج من التطبيق
-      if (view === 'dashboard' && mode === 'none') {
-        const confirmExit = window.confirm("هل تريد الخروج من التطبيق؟");
-        if (confirmExit) {
-          CapacitorApp.exitApp();
-        }
-      } else {
-        // في أي شاشة ثانية → رجوع خطوة للخلف
-        window.history.back();
-      }
-    });
+  const registerListener = async () => {
+    await CapacitorApp.removeAllListeners();
+    backHandler = await CapacitorApp.addListener('backButton', onBack);
+  };
 
-    // تنظيف المستمع عند إغلاق الكومبوننت
-    return () => {
-      backListener.remove();
-    };
-  }, []); //Empty dependency array = stable listener
+  registerListener();
+
+  return () => {
+    if (backHandler) {
+      backHandler.remove();
+    }
+  };
+}, []); //Empty dependency array = stable listener
 
   // --- NAVIGATION SYSTEM END ---
 
