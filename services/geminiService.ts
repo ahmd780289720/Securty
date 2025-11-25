@@ -1,18 +1,17 @@
  
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
+import { GOOGLE_API_KEY } from "../env.local";
 // Helper to safely check connection
 const isOffline = () => !navigator.onLine;
 
 // Safely initialize AI only when needed/online to avoid crash
 const getAIClient = () => {
   try {
-    // Strict check for API Key availability
-    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
-      return new GoogleGenerativeAI(process.env.API_KEY);
-    }
-    return null;
+    if (!GOOGLE_API_KEY) return null;
+
+    return new GoogleGenerativeAI(GOOGLE_API_KEY);
   } catch (e) {
+    console.error("AI Init error:", e);
     return null;
   }
 };
