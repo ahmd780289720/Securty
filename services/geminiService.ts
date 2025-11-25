@@ -123,8 +123,34 @@ export const askTutor = async (query: string, history: string[], imageBase64?: s
 const result = await modelRef.generateContent(parts);
 
 return result.response.text() || "خطأ في معالجة البيانات.";
-  } catch (error) {
+  } } catch (error: any) {
     console.error("AI Error:", error);
-    return "فشل الاتصال بوحدة المعالجة المركزية (Error processing request).";
+
+    // 1) حالة عدم وجود مفتاح أصلاً
+    if (!GOOGLE_API_KEY) {
+      return "مفتاح API غير مضبوط داخل التطبيق. افتح ملف env.local وتأكد من وجود GOOGLE_API_KEY بالقيمة الصحيحة.";
+    }
+
+    // 2) نستخرج الرسالة الحقيقيّة من الخطأ
+    const msg =
+      error && typeof error === "object" && "message" in error
+        ? String(error.message)
+        : String(error);
+
+    // 3) أخطاء شائعة مرتبطة بالمفتاح
+    if (msg.toLowerCase().includes("api key") || msg.toLowerCase().includes("apikey")) {
+      return "مفتاح Google AI غير صالح أو تم حذفه أو تقييده. أنشئ مفتاحًا جديدًا من Google AI Studio وانسخه إلى ملف env.local.";
+    }
+
+    if (msg.toLowerCase().includes("permission") || msg.toLowerCase().includes("403")) {
+      return "لا توجد صلاحيات كافية لاستخدام واجهة Google AI بهذا المفتاح. تأكد أن المشروع مفعل وأن المفتاح مسموح له باستخدام النماذج.";
+    }
+
+    if (msg.toLowerCase().includes("quota")) {
+      return "تم استهلاك الحصة المجانية لمفتاح Google AI. جرّب مفتاحًا جديدًا أو انتظر إعادة التعيين.";
+    }
+
+    // 4) رسالة افتراضية مع نص الخطأ للمساعدة في التشخيص
+    return `فشل الاتصال بوحدة المعالجة المركزية (Error processing request): ${msg}`;
   }
 };
