@@ -126,35 +126,12 @@ const result = await modelRef.generateContent(parts);
 
     return text || "لا يوجد رد متاح حالياً.";
   } catch (error: any) {
-    console.error("AI Error:", error);
+  console.error("AI Error:", error);
 
-    // (1) حالة عدم وجود مفتاح
-    if (!GOOGLE_API_KEY) {
-      return "مفتاح API غير مضبوط داخل التطبيق. افتح ملف env.local وتأكد من وجود GOOGLE_API_KEY بالقيمة الصحيحة.";
-    }
+  const msg =
+    error && typeof error === "object" && "message" in error
+      ? String(error.message)
+      : JSON.stringify(error);
 
-    // (2) استخراج الرسالة الحقيقيّة
-    const msg =
-      error && typeof error === "object" && "message" in error
-        ? String((error as any).message)
-        : String(error);
-
-    // (3) أخطاء مرتبطة بالمفتاح
-    const lower = msg.toLowerCase();
-
-    if (lower.includes("api key") || lower.includes("apikey")) {
-      return "مفتاح Google AI غير صالح أو تم حذفه أو تقييده. أنشئ مفتاحًا جديدًا وانسخه إلى env.local.";
-    }
-
-    if (lower.includes("permission") || lower.includes("403")) {
-      return "لا توجد صلاحيات كافية لاستخدام نماذج Google AI بهذا المفتاح.";
-    }
-
-    if (lower.includes("quota")) {
-      return "تم استهلاك الحصة المجانية لمفتاح Google AI. استخدم مفتاحًا جديدًا.";
-    }
-
-    // (4) رسالة افتراضية مع الخطأ الخام
-    return `فشل الاتصال بوحدة المعالجة المركزية: ${msg}`;
-  }
-};
+  return `DEBUG من Google: ${msg}`;
+}
