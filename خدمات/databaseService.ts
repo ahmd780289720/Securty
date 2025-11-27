@@ -1,47 +1,54 @@
 // خدمات/databaseService.ts
-// خدمة بسيطة ترجع الدروس من مصفوفة ثابتة (أوفلاين %100)
+// خدمة ترجع الدروس من مستويات مختلفة (أوفلاين 100%)
 
+// نوع الدرس
 export type Lesson = {
-  id: string;
-  level: number;     // المستوى 1..4
-  unit: number;      // 1..10
-  order: number;     // 1..10
-  titleAr: string;
-  titleEn: string;
-  content: string;
+  id: string;       // مثال: L1-U1-1
+  level: number;    // رقم المستوى: 1..4
+  unit: number;     // رقم الوحدة داخل المستوى: 1..10
+  order: number;    // رقم الدرس داخل الوحدة: 1..10
+  titleAr: string;  // عنوان عربي
+  titleEn: string;  // عنوان إنجليزي
+  content: string;  // محتوى الدرس (نص طويل)
 };
 
-// مؤقتاً: درس واحد للتجربة – بعدين نضيف 100 درس لكل مستوى
-export const lessons: Lesson[] = [
-  {
-    id: "L1-U1-1",
-    level: 1,
-    unit: 1,
-    order: 1,
-    titleAr: "ما هو الأمن السيبراني؟",
-    titleEn: "What is Cybersecurity?",
-    content: `
-الأمن السيبراني هو علم حماية الأنظمة الرقمية من الاختراق أو التلاعب.
-هذا درس تجريبي فقط، وسنستبدله لاحقاً بمحتوى قصصي كامل ومترابط.
-    `.trim(),
-  },
+// استيراد دروس المستوى الأول من ملف مستقل
+import { level1Lessons } from "./level1";
+
+// هنا لاحقاً نضيف:
+// import { level2Lessons } from "./level2";
+// import { level3Lessons } from "./level3";
+// import { level4Lessons } from "./level4";
+
+const allLessons: Lesson[] = [
+  ...level1Lessons,
+  // ...level2Lessons,
+  // ...level3Lessons,
+  // ...level4Lessons,
 ];
 
-// دوال مساعدة
+// عدد المستويات الموجودة حالياً
 export function getLevels(): number[] {
-  return [1, 2, 3, 4];
+  // الآن فعلياً شغالين فقط على المستوى الأول
+  return [1];
 }
 
+// نفترض أن كل مستوى يدعم حتى 10 وحدات (حتى لو بعضها فاضي حالياً)
 export function getUnitsByLevel(level: number): number[] {
   return Array.from({ length: 10 }, (_, i) => i + 1);
 }
 
+// جلب دروس وحدة معيّنة داخل مستوى معيّن
 export function getLessons(level: number, unit: number): Lesson[] {
-  return lessons
+  return allLessons
     .filter((l) => l.level === level && l.unit === unit)
     .sort((a, b) => a.order - b.order);
 }
 
+// جلب درس معيّن بالـ id (لو الشاشة تستخدم id مباشر)
 export function getLessonById(id: string): Lesson | undefined {
-  return lessons.find((l) => l.id === id);
+  return allLessons.find((l) => l.id === id);
 }
+
+// للتجربة أو الاستخدام العام
+export const lessons = allLessons;
