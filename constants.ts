@@ -1,6 +1,11 @@
 
 import { Level, QuestionType, Lesson, UserState, Module, Course, Question } from './types';
+import { level1Units } from "./units/level1Units";
+import { level1Lessons } from "./services/database/level1";
 
+export const L1_UNITS = level1Units;
+export const L1_LESSONS = level1Lessons;
+// --- LEVEL 2: TECHNICAL (المحلل) ---
 // ==========================================
 // UTILITIES
 // ==========================================
@@ -325,12 +330,6 @@ export const KALI_CURRICULUM: Course = {
 
 // --- LEVEL 1: FOUNDATION (المجند) ---ear Phishing)',
       
-      import { level1Units } from "./units/level1Units";
-import { level1Lessons } from "./services/database/level1";
-
-export const L1_UNITS = level1Units;
-export const L1_LESSONS = level1Lessons;
-// --- LEVEL 2: TECHNICAL (المحلل) ---
 const L2_UNITS = [
   {
     title: '1. معمارية الشبكات المتقدمة',
