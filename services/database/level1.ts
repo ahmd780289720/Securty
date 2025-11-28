@@ -95,14 +95,15 @@ export const level1Lessons: Lesson[] = [
 
 `.trim(),
   },
-  {
-    id: "L1-U1-2",
-    level: 1,
-    unit: 1,
-    order: 2,
-    titleAr: "طبقات العالم الرقمي",
-    titleEn: "Layers of the Digital World",
-    content:
+{
+  id: "L1-U1-2",
+  level: 1,
+  unit: 1,
+  order: 2,
+  titleAr: "طبقات العالم الرقمي",
+  titleEn: "Layers of the Digital World",
+  content: `
+  
 هل تذكر اللحظة التي انتهى بها الدرس الأول؟  
 حين توقفت عند فكرة أن العالم الرقمي ليس مجرد تطبيقات وبيانات…  
 بل “وعي جديد” يبدأ من القدرة على رؤية ما لا يظهر على السطح؟
@@ -189,9 +190,9 @@ export const level1Lessons: Lesson[] = [
 طبقة بعد طبقة…  
 وعي بعد وعي…  
 وخطوتك التالية ستكون أعمق.
-
 `.trim(),
 },
+
 {
   id: "L1-U1-3",
   level: 1,
